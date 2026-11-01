@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shajara – Oila Shajarasi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--card:#10352d;--gold:#e0bd6f;--ln:#b8924a;--tx:#e9efe6;--mut:#8fb0a2}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% 35%,#14503f 0,#07201a 72%);color:var(--tx);font:14px "Nunito Sans",system-ui,sans-serif}
+header{padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-bottom:1px solid #1f4a3e;background:#07201aee}
+h1{margin:0 auto 0 0;font:700 1.7rem "Cormorant Garamond",Georgia,serif;color:var(--gold)}
+header input,header select,header button{height:38px;border-radius:10px;border:1px solid #2d6455;background:#0d2c25;color:var(--tx);font:inherit;padding:0 12px}
+header button{cursor:pointer;min-width:38px}
+header button:hover{border-color:var(--gold)}
+#q{width:190px}
+#cnt{color:var(--mut);font-size:.85rem}
+#vp{flex:1;overflow:auto;cursor:grab;position:relative}
+#vp:active{cursor:grabbing}
+#sz{position:relative}
+#c{position:absolute;left:0;top:0;transform-origin:0 0}
+svg{position:absolute;left:0;top:0;pointer-events:none}
+.card{position:absolute;width:78px;height:84px;padding:6px 3px;border:1.5px solid #2d6455;border-radius:10px;background:var(--card);text-align:center;overflow:hidden}
+.av{width:34px;height:34px;margin:0 auto 3px;border-radius:50%;background:#1b4d42;border:2px solid #4f8f7d;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#d6efe6}
+.card.sp{background:#0d2a24;border-style:dashed}
+.card.sp .av{background:#14382f;border-color:var(--mut)}
+.nm{font-size:10.5px;line-height:1.15;font-weight:600;max-height:25px;overflow:hidden}
+.yr{font-size:9.5px;color:var(--mut);margin-top:2px}
+.card.sine{border-color:var(--gold);box-shadow:0 0 12px #e0bd6f55}
+.card.sine .av{border-color:var(--gold)}
+.card.me{background:#3b3314}
+.card.me::after{content:"Men";position:absolute;top:2px;right:4px;font-size:9px;font-weight:700;color:var(--gold)}
+.card.dead{opacity:.7}
+.card.hit{outline:3px solid #fff;z-index:2}
+.lk{position:absolute;width:16px;height:16px;line-height:16px;text-align:center;font-size:12px;color:var(--gold)}
+.gen{position:absolute;transform:translateX(-50%);padding:2px 10px;border-radius:9px;background:linear-gradient(#f0d58e,#c79a45);color:#2b2108;font-weight:700;font-size:10px;white-space:nowrap}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+<h1>Shajara – Oila Shajarasi</h1>
+<select id="sel" aria-label="Shajara tanlash"></select>
+<input id="q" type="search" placeholder="Qidirish..." aria-label="Qidirish">
+<span id="cnt"></span>
+<button id="zo" aria-label="Kichraytirish">−</button>
+<button id="zi" aria-label="Kattalashtirish">+</button>
+<button id="me">Men</button>
+</header>
+<div id="vp"><div id="sz"><div id="c"></div></div></div>
+<script>
+/* "-" belgilari avlod chuqurligi, "&" – turmush o‘rtog‘i, "~" – izoh, "*" – asosiy chiziq, "{}" – yillar, vergul – aka-ukalar. */
+const D=`
+*Shoqosim & Fatima
+-*Shorustam & Sanobar
+--*Shoqosim & Aygul ~ ikkinchi Shoqosim
+---*Shousmon & Zuhra
+----*Shoasqar & Marhamat
+-----Mahbuba
+-----Masuda
+------Tohir
+-------Nodir & Dilafruz
+-------Nigora ~ o’g’li Muhammad Amin (Soliha eri)
+-------Shohrux & Nazokat ~ bizning xola Nazokat emas
+-------Farrux & Nigora ~ Nigora — Shuhrat va Lola qizi
+------Sofiya, Zulfiya, Zokir, Zoid
+-----Shoakram & Mahliyo ~ asl ismi Meylan
+------Mohinur
+------Shoyusuf ~ o’g’li Shousmon (Dilya eri)
+------Shoyoqub{≈1966} & Komila{≈1966–2014}
+-------Shorasul{≈1984}
+--------Shoaziz, Hadicha, Habiba, Shoumar, Maryam
+-------Nazira{≈1985}
+--------Abdulaziz, Muslima & Abdullah, Nurmuhammad, Muhammad Yusuf, Fatima
+-------Shahnoza{≈1990} ~ Amina onasi
+-------Naima{≈1999}
+--------Muhammad Ali, Rayona, Sofiya, Muhammad Abdulloh, Xadicha
+-----Marg’uba, Shoaziz
+-----*Muborak{≈1944} & To’xtamurod{≈1942} ~ To’xtamurodning ota-onasi: Abdug’ani va Mohinisa
+------*Lola{≈1962} & Shuhrat{≈1957–2023}
+-------*Azamat{1984} & Shahnoza{≈1990}
+--------*Amina{2008}
+--------Ahmadjon{≈2009}, Oysha{≈2016}, Sofiya{≈2017}, Muhammad{≈2020}
+-------Nigora{≈1981} & Farrux{≈1978}
+--------Muhammad Qosim{≈2011}
+-------Nazokat{≈1996} & Dilmurod{≈1991}
+--------Munira{≈2019}, Maryam{≈2022}, Mustafa{≈2024}
+------Noiba{≈1963} & Ne’matilla
+-------Nodira{≈1981} & Ramziddin
+-------Fozil{≈1996}, Fazliddin{≈2003}
+-------Nosir{≈1988} & Kamola
+--------Muhammad, Solih
+------Saodat{≈1972} & Fahriddin{≈1967}
+-------Yodgor{≈1994} & Noila
+--------Mavjuda{≈2016}, Muhammad Yusuf{≈2018}, Muhammad Amin{≈2021}
+-------Abdurahmon{≈2005}
+-------Soliha{≈2001} & Muhammad Amin
+--------Surayyo{≈2022}, Safiya{≈2024}
+------Dilafruz{≈1964–2021}
+-------Nargiza{≈1981} & Abdurahim{≈1978}
+--------Omina{≈2006}, Risolat{≈2009}, Abdurahmon{≈2012}
+-------Fathulla{≈1986–2016} ~ vafot etgan
+------Komil{≈1975} & Kamola
+-------Ahror{≈2000}, Hojakbar{≈2002}, Nafisa{≈2005} & Abduqodir{≈2003}, Naima{≈2019}
+------Sobir{≈1967} & Nazokat
+-------Umida{≈2006} & Abdullah{≈2001}
+--------Umarxon{≈2025}
+-------Solihjon{≈2007}, Robiya{≈2013}
+------Dildora{≈1971}
+----Muqaddas, Munavvar
+#Shuhrat bobo tomoni
+Muhammad & Aysha
+-Shokir & Muhabbat
+--*Shuhrat{≈1957–2023} & Lola{≈1962} ~ farzandlari yuqoridagi shajarada
+--Surayo & Kamil
+---Lola, Dilshod, Sherzod
+--Muattar ~ eri vafot etgan
+---Dilya & Shousmon ~ eri Shoyusufning o’g’li
+----Shoyusuf ~ ikkinchi Shoyusuf
+----Abdulkarim, Abdullah, Xayriniso, Maryam
+---Nilufar
+----Sogdiana, Kamron
+--Shakir & Sanobar
+---Samiya, Leyla, Nodir
+`;
+function P(t){const m=t.match(/^(.*?)\s*\{([^}]*)\}\s*$/);return m?[m[1],m[2]]:[t,""]}
+let cur={c:[],t:"Asosiy shajara"};const secs=[cur],st=[cur];
+D.trim().split("\n").forEach(l=>{
+  if(l[0]=="#"){cur={c:[],t:l.slice(1).trim()};secs.push(cur);st.length=0;st.push(cur);return}
+  const d=l.match(/^-*/)[0].length;
+  l.slice(d).split(",").forEach(s=>{
+    s=s.trim();if(!s)return;
+    const spine=s[0]=="*";if(spine)s=s.slice(1);
+    const [a,note]=s.split("~").map(x=>x.trim());
+    const [p1,p2]=a.split("&").map(x=>x.trim());
+    const [name,y]=P(p1),[sp,sy]=p2?P(p2):[null,""];
+    const n={name,y,sp,sy,note,spine,c:[]};
+    st.length=d+1;st[d].c.push(n);st[d+1]=n;
+  });
+});
+const CW=78,CH=84,LK=16,GP=14,RH=150,PT=50,PL=40,RM=["I","II","III","IV","V","VI","VII","VIII","IX","X"];
+const vp=document.getElementById("vp"),sz=document.getElementById("sz"),c=document.getElementById("c"),sel=document.getElementById("sel"),q=document.getElementById("q"),cnt=document.getElementById("cnt");
+let z=innerWidth<700?.55:.75,W=0,H=0,me=null,rt=null;
+function meas(n){n.ow=n.sp?CW*2+LK:CW;n.cw=0;n.c.forEach(k=>n.cw+=meas(k)+GP);if(n.cw)n.cw-=GP;return n.w=Math.max(n.ow,n.cw)}
+function place(n,x0,d){n.cx=x0+n.w/2;n.d=d;n.top=PT+d*RH;let x=x0+(n.w-n.cw)/2;n.c.forEach(k=>{place(k,x,d+1);x+=k.w+GP})}
+function ini(s){const w=s.split(/\s+/);return(w.length>1?w[0][0]+w[1][0]:s.slice(0,2)).toUpperCase()}
+function card(nm,y,x,top,cls,note,other){return '<div class="card '+cls+'" style="left:'+x+'px;top:'+top+'px" title="'+(note||"")+'" data-x="'+(x+CW/2)+'" data-y="'+(top+CH/2)+'" data-s="'+(nm+" "+(other||"")).toLowerCase()+'"><div class="av">'+ini(nm)+'</div><div class="nm">'+nm+'</div><div class="yr">'+(y||"&nbsp;")+'</div></div>'}
+function show(i){
+  const root=secs[i].c[0];rt=root;me=null;meas(root);place(root,PL,0);
+  let h="",p="",mx=0;const g={};
+  (function w(n){
+    const L=n.cx-n.ow/2;mx=Math.max(mx,n.d);
+    if(n.spine&&n.name=="Amina")me=n;
+    if(!g[n.d]||(n.spine&&!g[n.d].spine))g[n.d]=n;
+    h+=card(n.name,n.y,L,n.top,(n.spine?"sine ":"")+(n.spine&&n.name=="Amina"?"me ":"")+(n.note&&/vafot/.test(n.note)?"dead":""),n.note,n.sp);
+    if(n.sp){h+=card(n.sp,n.sy,L+CW+LK,n.top,"sp","",n.name);h+='<div class="lk" style="left:'+(L+CW)+'px;top:'+(n.top+30)+'px">∞</div>'}
+    if(n.c.length){
+      const ym=n.top+CH+(RH-CH)/2,sy=n.sp?n.top+46:n.top+CH,xs=n.c.map(k=>k.cx);
+      p+="M"+n.cx+" "+sy+"V"+ym+"M"+Math.min(...xs)+" "+ym+"H"+Math.max(...xs);
+      n.c.forEach(k=>{p+="M"+k.cx+" "+ym+"V"+(k.top);w(k)});
+    }
+  })(root);
+  Object.keys(g).forEach(d=>{h+='<div class="gen" style="left:'+g[d].cx+'px;top:'+(PT+d*RH-24)+'px">'+RM[d]+'-AVLOD</div>'});
+  W=root.w+2*PL;H=PT+(mx+1)*RH;
+  c.innerHTML='<svg width="'+W+'" height="'+H+'"><path d="'+p+'" stroke="#b8924a" stroke-width="2" fill="none"/></svg>'+h;
+  c.style.width=W+"px";c.style.height=H+"px";
+  setZ(z);q.value="";cnt.textContent="";
+  ctr((me||root).cx,(me||root).top);
+}
+function setZ(v){z=Math.min(1.6,Math.max(.2,v));c.style.transform="scale("+z+")";sz.style.width=W*z+"px";sz.style.height=H*z+"px"}
+function ctr(x,y){vp.scrollLeft=x*z-vp.clientWidth/2;vp.scrollTop=y*z-vp.clientHeight/2}
+function zoom(f){const x=(vp.scrollLeft+vp.clientWidth/2)/z,y=(vp.scrollTop+vp.clientHeight/2)/z;setZ(z*f);ctr(x,y)}
+secs.forEach((s,i)=>sel.add(new Option(s.t,i)));
+sel.onchange=()=>show(+sel.value);
+document.getElementById("zi").onclick=()=>zoom(1.2);
+document.getElementById("zo").onclick=()=>zoom(1/1.2);
+document.getElementById("me").onclick=()=>{if(+sel.value!=0){sel.value=0;show(0)}else ctr(me.cx,me.top)};
+q.oninput=()=>{
+  const v=q.value.trim().toLowerCase();let f=null,k=0;
+  c.querySelectorAll(".card").forEach(e=>{const h=!!v&&e.dataset.s.includes(v);e.classList.toggle("hit",h);if(h){k++;if(!f)f=e}});
+  cnt.textContent=v?k+" ta":"";
+  if(f)ctr(+f.dataset.x,+f.dataset.y);
+};
+let dr=null;
+vp.onpointerdown=e=>{if(e.pointerType!="mouse")return;dr=[e.clientX,e.clientY,vp.scrollLeft,vp.scrollTop]};
+vp.onpointermove=e=>{if(dr){vp.scrollLeft=dr[2]-(e.clientX-dr[0]);vp.scrollTop=dr[3]-(e.clientY-dr[1])}};
+addEventListener("pointerup",()=>dr=null);
+show(0);
+</script>
+</body>
+</html>
